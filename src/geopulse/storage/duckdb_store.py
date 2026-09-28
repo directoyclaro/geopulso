@@ -310,6 +310,175 @@ class DuckDBStore:
             self.conn.execute("DELETE FROM keywords WHERE term = ?", [term])
         return existed
 
+    # --- Ubicaciones geograficas ---
+    def upsert_location(self, location: dict[str, Any]) -> str:
+        from ..utils.text import slugify
+
+        name = (location.get("name") or "").strip()
+        if not name:
+            raise ValueError("La ubicacion necesita un nombre")
+        location_id = location.get("location_id") or slugify(name)
+        self.conn.execute(
+            """
+            INSERT INTO locations (location_id, name, level, municipio, province, country,
+                                   lat, lon, aliases, source, active)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            ON CONFLICT (location_id) DO UPDATE SET
+                name = excluded.name,
+                level = excluded.level,
+                municipio = excluded.municipio,
+                lat = excluded.lat,
+                lon = excluded.lon,
+                aliases = excluded.aliases,
+                active = TRUE
+            """,
+            [
+                location_id,
+                name,
+                location.get("level", "custom"),
+                location.get("municipio"),
+                location.get("province", "Bahoruco"),
+                location.get("country", "DO"),
+                location.get("lat"),
+                location.get("lon"),
+                location.get("aliases", []),
+                location.get("source", "manual"),
+                bool(location.get("active", True)),
+            ],
+        )
+        return location_id
+
+    def upsert_locations(self, locations: Iterable[dict[str, Any]]) -> int:
+        count = 0
+        for loc in locations:
+            self.upsert_location(loc)
+            count += 1
+        return count
+
+    def get_locations(self, active_only: bool = False) -> list[dict]:
+        query = "SELECT * FROM locations"
+        if active_only:
+            query += " WHERE active = TRUE"
+        query += " ORDER BY level, name"
+        cols = [c[0] for c in self.conn.execute(query).description]
+        return [dict(zip(cols, row)) for row in self.conn.fetchall()]
+
+    def remove_location(self, location_id: str) -> bool:
+        existed = self.conn.execute(
+            "SELECT COUNT(*) FROM locations WHERE location_id = ?", [location_id]
+        ).fetchone()[0] > 0
+        if existed:
+            self.conn.execute("DELETE FROM locations WHERE location_id = ?", [location_id])
+        return existed
+
+    def set_location_active(self, location_id: str, active: bool) -> None:
+        self.conn.execute("UPDATE locations SET active = ? WHERE location_id = ?", [active, location_id])
+
+    # --- Temas de conversacion ---
+    def upsert_topic(self, topic: dict[str, Any]) -> str:
+        from ..utils.text import slugify
+
+        label = (topic.get("label") or topic.get("topic_id") or "").strip()
+        if not label:
+            raise ValueError("El tema necesita una etiqueta")
+        topic_id = topic.get("topic_id") or slugify(label)
+        self.conn.execute(
+            """
+            INSERT INTO topics (topic_id, label, taxonomy_id, keywords, source, active, selected)
+            VALUES (?, ?, ?, ?, ?, ?, ?)
+            ON CONFLICT (topic_id) DO UPDATE SET
+                label = excluded.label,
+                taxonomy_id = excluded.taxonomy_id,
+                keywords = excluded.keywords,
+                active = TRUE
+            """,
+            [
+                topic_id,
+                label,
+                topic.get("taxonomy_id", topic_id),
+                topic.get("keywords", []),
+                topic.get("source", "manual"),
+                bool(topic.get("active", True)),
+                bool(topic.get("selected", True)),
+            ],
+        )
+        return topic_id
+
+    def get_topics(self, active_only: bool = False, selected_only: bool = False) -> list[dict]:
+        query = "SELECT * FROM topics"
+        conditions = []
+        if active_only:
+            conditions.append("active = TRUE")
+        if selected_only:
+            conditions.append("selected = TRUE")
+        if conditions:
+            query += " WHERE " + " AND ".join(conditions)
+        query += " ORDER BY label"
+        cols = [c[0] for c in self.conn.execute(query).description]
+        return [dict(zip(cols, row)) for row in self.conn.fetchall()]
+
+    def remove_topic(self, topic_id: str) -> bool:
+        existed = self.conn.execute(
+            "SELECT COUNT(*) FROM topics WHERE topic_id = ?", [topic_id]
+        ).fetchone()[0] > 0
+        if existed:
+            self.conn.execute("DELETE FROM topics WHERE topic_id = ?", [topic_id])
+        return existed
+
+    def set_topic_selected(self, topic_id: str, selected: bool) -> None:
+        self.conn.execute("UPDATE topics SET selected = ? WHERE topic_id = ?", [selected, topic_id])
+
+    def set_topic_active(self, topic_id: str, active: bool) -> None:
+        self.conn.execute("UPDATE topics SET active = ? WHERE topic_id = ?", [active, topic_id])
+
+    # --- Comentarios ---
+    def insert_comments(self, comments: Iterable[dict[str, Any]]) -> int:
+        rows = [
+            [
+                c["comment_id"],
+                c.get("post_raw_id"),
+                c.get("platform"),
+                c.get("text"),
+                c.get("language"),
+                c.get("author_hash"),
+                c.get("posted_at"),
+                c.get("url"),
+                c.get("keywords", []),
+                c.get("simhash"),
+                utcnow(),
+            ]
+            for c in comments
+        ]
+        if not rows:
+            return 0
+        self.conn.executemany(
+            """
+            INSERT INTO comments (comment_id, post_raw_id, platform, text, language,
+                                  author_hash, posted_at, url, keywords, simhash, collected_at)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            ON CONFLICT (comment_id) DO NOTHING
+            """,
+            rows,
+        )
+        return len(rows)
+
+    def search_comments(self, term: str, limit: int = 100) -> list[dict]:
+        cols = [c[0] for c in self.conn.execute(
+            """
+            SELECT comment_id, platform, text, url, keywords, collected_at
+            FROM comments WHERE text ILIKE ? ORDER BY collected_at DESC LIMIT ?
+            """,
+            [f"%{term}%", limit],
+        ).description]
+        return [dict(zip(cols, row)) for row in self.conn.fetchall()]
+
+    def get_comments(self, limit: int = 100) -> list[dict]:
+        cols = [c[0] for c in self.conn.execute(
+            "SELECT comment_id, platform, text, url, keywords, collected_at FROM comments ORDER BY collected_at DESC LIMIT ?",
+            [limit],
+        ).description]
+        return [dict(zip(cols, row)) for row in self.conn.fetchall()]
+
     # --- Tendencias ---
     def get_daily_topic_counts(self, lookback_days: int = 30) -> list[dict]:
         rows = self.conn.execute(

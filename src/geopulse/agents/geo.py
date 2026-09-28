@@ -69,9 +69,10 @@ def _load_nlp():
 
 
 class GeoMapper:
-    def __init__(self, config: Config) -> None:
+    def __init__(self, config: Config, extra_locations: list[dict[str, Any]] | None = None) -> None:
         self.config = config
         self.gcfg = config.geo
+        self.extra_locations = extra_locations or []
         self._index = self._build_index()
 
     def _build_index(self) -> dict[str, dict[str, Any]]:
@@ -79,6 +80,21 @@ class GeoMapper:
         for place in self.config.gazetteer.get("places", []):
             keys = {place["name"], *place.get("aliases", [])}
             for key in keys:
+                index[normalize_key(key)] = place
+        # Ubicaciones gestionadas manualmente (tienen prioridad)
+        for loc in self.extra_locations:
+            name = loc.get("name")
+            if not name:
+                continue
+            place = {
+                "name": name,
+                "level": loc.get("level", "custom"),
+                "municipio": loc.get("municipio") or ("name" if loc.get("level") == "municipio" else None),
+                "aliases": loc.get("aliases") or [],
+            }
+            if not place["municipio"] and loc.get("level") == "municipio":
+                place["municipio"] = name
+            for key in {name, *place["aliases"]}:
                 index[normalize_key(key)] = place
         # Gentilicios -> lugar existente
         for alias, target in _EXTRA_ALIASES.items():

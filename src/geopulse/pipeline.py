@@ -23,6 +23,12 @@ def _sources_by_id(store: DuckDBStore) -> dict[str, dict[str, Any]]:
     return {s["source_id"]: s for s in store.get_sources()}
 
 
+def _build_geo_mapper(config: Config, store: DuckDBStore) -> GeoMapper:
+    from .locations import effective_locations
+
+    return GeoMapper(config, extra_locations=effective_locations(config, store))
+
+
 def _existing_simhashes(store: DuckDBStore) -> list[int]:
     rows = store.query("SELECT simhash FROM posts WHERE simhash IS NOT NULL")
     return [r[0] for r in rows]
@@ -38,8 +44,7 @@ def _process_records(config: Config, store: DuckDBStore, raw: list[dict]) -> dic
     )
     posts = normalizer.process(raw, sources)
     inserted = store.insert_posts(posts)
-    geo = GeoMapper(config)
-    geo_records = geo.process(posts, sources)
+    geo_records = _build_geo_mapper(config, store).process(posts, sources)
     store.insert_posts_geo(geo_records)
     return {"raw": len(raw), "normalized": len(posts), "stored": inserted, "geocoded": len(geo_records)}
 
@@ -164,10 +169,30 @@ def regeo_all(config: Config, store: DuckDBStore) -> dict[str, int]:
     rows = store.query(f"SELECT {', '.join(cols)} FROM posts")
     posts = [dict(zip(cols, row)) for row in rows]
     sources = _sources_by_id(store)
-    geo_records = GeoMapper(config).process(posts, sources)
+    geo_records = _build_geo_mapper(config, store).process(posts, sources)
     store.insert_posts_geo(geo_records)
     resolved = sum(1 for g in geo_records if g.get("municipality"))
     return {"posts": len(posts), "resolved": resolved}
+
+
+def collect_comments(config: Config, store: DuckDBStore, target: str, amount: int = 50) -> dict[str, int]:
+    """Recolecta y almacena comentarios de una publicacion publica."""
+    from .collectors.comments import collect_comments as _collect
+    from .utils.text import is_spanish, keyword_hits, simhash64
+
+    raw = _collect(config, store, target, amount)
+    kws = effective_keywords(config, store)
+    for record in raw:
+        record["keywords"] = keyword_hits(record.get("text", ""), kws)
+        record["simhash"] = simhash64(record.get("text", ""))
+        record["language"] = "es" if is_spanish(record.get("text", "")) else record.get("language")
+    stored = store.insert_comments(raw)
+    return {"collected": len(raw), "stored": stored}
+
+
+def search_comments(config: Config, store: DuckDBStore, term: str, limit: int = 100) -> list[dict]:
+    """Busca un termino dentro de los comentarios almacenados."""
+    return store.search_comments(term, limit=limit)
 
 
 def run_trends(config: Config, store: DuckDBStore) -> dict[str, int]:

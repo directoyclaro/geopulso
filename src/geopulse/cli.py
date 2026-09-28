@@ -11,11 +11,14 @@ from pathlib import Path
 from .config import get_config
 from .keywords import add_trend_keywords, suggest_from_trends
 from .llm.ollama_client import OllamaClient
+from .locations import seed_locations
+from .topics import seed_topics
 from .orchestrator.jobs import run_job
 from .orchestrator.queue import JobQueue
 from .pipeline import (
     build_store,
     collect_and_process,
+    collect_comments,
     discover_places,
     discover_profiles,
     regeo_all,
@@ -24,6 +27,7 @@ from .pipeline import (
     run_report,
     run_trends,
     scan_profile,
+    search_comments,
     search_content,
     search_keywords,
 )
@@ -42,7 +46,11 @@ def cmd_init_db(args: argparse.Namespace) -> None:
     config = get_config()
     store = build_store(config)
     count = load_seed_sources(config, store)
-    print(f"Esquema inicializado. Fuentes semilla cargadas/actualizadas: {count}")
+    locations = seed_locations(config, store)
+    topics = seed_topics(config, store)
+    print(
+        f"Esquema inicializado. Fuentes: {count} | Ubicaciones: {locations} | Temas: {topics}"
+    )
     store.close()
 
 
@@ -146,6 +154,105 @@ def cmd_manual_login(args: argparse.Namespace) -> None:
             print("Login de Facebook completado.")
         except Exception as exc:  # noqa: BLE001
             print(f"Login de Facebook no completado: {exc}")
+
+
+def cmd_locations(args: argparse.Namespace) -> None:
+    from .utils.text import slugify
+
+    config = get_config()
+    store = build_store(config)
+    if args.action == "seed":
+        print(f"Ubicaciones sembradas/actualizadas: {seed_locations(config, store)}")
+    elif args.action == "list":
+        for loc in store.get_locations(active_only=False):
+            estado = "activa" if loc["active"] else "inactiva"
+            print(f"- {loc['location_id']}: {loc['name']} ({loc['level']}, mun={loc['municipio']}) {estado}")
+    elif args.action == "add":
+        if not args.name:
+            print("Falta --name")
+        else:
+            lid = store.upsert_location(
+                {
+                    "name": args.name,
+                    "level": args.level,
+                    "municipio": args.municipio,
+                    "lat": args.lat,
+                    "lon": args.lon,
+                    "aliases": [a.strip() for a in args.aliases.split(",")] if args.aliases else [],
+                }
+            )
+            print(f"Ubicacion agregada: {lid}")
+    else:
+        if not args.name:
+            print("Falta --name (id o nombre de la ubicacion)")
+        else:
+            lid = slugify(args.name)
+            if args.action == "remove":
+                print("Eliminada" if store.remove_location(lid) else "No existe", lid)
+            else:
+                store.set_location_active(lid, args.action == "enable")
+                print(f"{args.action}: {lid}")
+    store.close()
+
+
+def cmd_topics(args: argparse.Namespace) -> None:
+    config = get_config()
+    store = build_store(config)
+    if args.action == "seed":
+        print(f"Temas sembrados/actualizados: {seed_topics(config, store)}")
+    elif args.action == "list":
+        for topic in store.get_topics(active_only=False):
+            print(f"- {topic['topic_id']}: {topic['label']} activo={topic['active']} seleccionado={topic['selected']}")
+    elif args.action == "add":
+        if not args.label:
+            print("Falta --label")
+        else:
+            tid = store.upsert_topic(
+                {
+                    "label": args.label,
+                    "taxonomy_id": args.taxonomy or args.label,
+                    "keywords": [k.strip() for k in args.keywords.split(",")] if args.keywords else [],
+                }
+            )
+            print(f"Tema agregado: {tid}")
+    else:
+        if not args.name:
+            print("Falta --name (id o etiqueta del tema)")
+        else:
+            from .utils.text import slugify
+
+            tid = slugify(args.name)
+            if args.action == "remove":
+                print("Eliminado" if store.remove_topic(tid) else "No existe", tid)
+            elif args.action == "select":
+                store.set_topic_selected(tid, True)
+                print(f"seleccionado: {tid}")
+            elif args.action == "deselect":
+                store.set_topic_selected(tid, False)
+                print(f"deseleccionado: {tid}")
+            else:
+                store.set_topic_active(tid, args.action == "enable")
+                print(f"{args.action}: {tid}")
+    store.close()
+
+
+def cmd_comments(args: argparse.Namespace) -> None:
+    config = get_config()
+    store = build_store(config)
+    result = collect_comments(config, store, args.target, amount=args.amount)
+    print(f"Comentarios: {result}")
+    store.close()
+
+
+def cmd_search_comments(args: argparse.Namespace) -> None:
+    config = get_config()
+    store = build_store(config)
+    rows = search_comments(config, store, args.term, limit=args.limit)
+    if not rows:
+        print(f"Sin comentarios que contengan '{args.term}'.")
+    for row in rows:
+        print(f"[{row['platform']}] {row['text'][:120]}")
+    store.close()
 
 
 def cmd_keywords(args: argparse.Namespace) -> None:
@@ -360,6 +467,34 @@ def build_parser() -> argparse.ArgumentParser:
     p_dp.add_argument("--per-place", type=int, default=8, dest="per_place")
     p_dp.add_argument("--reset", action="store_true", help="Borra descubrimientos previos antes de re-descubrir")
     p_dp.set_defaults(func=cmd_discover_places)
+
+    p_loc = sub.add_parser("locations", help="Gestiona ubicaciones geograficas")
+    p_loc.add_argument("action", choices=["seed", "list", "add", "remove", "enable", "disable"])
+    p_loc.add_argument("--name")
+    p_loc.add_argument("--level", default="custom")
+    p_loc.add_argument("--municipio")
+    p_loc.add_argument("--lat", type=float)
+    p_loc.add_argument("--lon", type=float)
+    p_loc.add_argument("--aliases", help="separados por coma")
+    p_loc.set_defaults(func=cmd_locations)
+
+    p_top = sub.add_parser("topics", help="Gestiona temas de conversacion")
+    p_top.add_argument("action", choices=["seed", "list", "add", "remove", "select", "deselect", "enable", "disable"])
+    p_top.add_argument("--name")
+    p_top.add_argument("--label")
+    p_top.add_argument("--taxonomy")
+    p_top.add_argument("--keywords", help="separados por coma")
+    p_top.set_defaults(func=cmd_topics)
+
+    p_com = sub.add_parser("comments", help="Recolecta comentarios de una publicacion publica")
+    p_com.add_argument("target", help="URL de Instagram o Facebook")
+    p_com.add_argument("--amount", type=int, default=50)
+    p_com.set_defaults(func=cmd_comments)
+
+    p_sc = sub.add_parser("search-comments", help="Busca un termino en los comentarios")
+    p_sc.add_argument("term")
+    p_sc.add_argument("--limit", type=int, default=100)
+    p_sc.set_defaults(func=cmd_search_comments)
 
     p_search = sub.add_parser("search", help="Busca contenido por palabra clave (Instagram)")
     p_search.add_argument("query")

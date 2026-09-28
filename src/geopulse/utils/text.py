@@ -148,6 +148,13 @@ def is_spanish(text: str, min_ratio: float = 0.06) -> bool:
     return any(marker in joined for marker in _DOMINICAN_MARKERS)
 
 
+def slugify(text: str) -> str:
+    """Genera un id estable a partir de un texto (minusculas, sin acentos)."""
+    base = normalize_key(text)
+    base = re.sub(r"[^a-z0-9]+", "_", base).strip("_")
+    return base or "item"
+
+
 def sha256_hash(value: str, salt: str = "") -> str:
     """Hash estable para anonimizar autores (nunca se guarda PII en claro)."""
     return hashlib.sha256(f"{salt}:{value}".encode("utf-8")).hexdigest()

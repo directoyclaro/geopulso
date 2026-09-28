@@ -3,7 +3,9 @@ from datetime import date
 from geopulse.agents.geo import GeoMapper
 from geopulse.config import Config
 from geopulse.keywords import add_trend_keywords, effective_keywords, suggest_from_trends
+from geopulse.locations import municipio_coordinates, seed_locations
 from geopulse.storage.duckdb_store import DuckDBStore
+from geopulse.topics import seed_topics
 
 
 def test_effective_keywords_merges_config_and_db(tmp_path):
@@ -57,6 +59,47 @@ def test_place_terms_includes_municipios_and_distritos():
     uvilla = next(t for t in terms if t["term"] == "Uvilla")
     assert uvilla["municipio"] == "Neiba"
     assert uvilla["level"] == "distrito"
+
+
+def test_locations_seed_and_coordinates(tmp_path):
+    store = DuckDBStore(tmp_path / "loc.duckdb")
+    store.init_schema()
+    seed_locations(Config(), store)
+    locs = store.get_locations()
+    assert len(locs) > 5
+    coords = municipio_coordinates(Config(), store)
+    assert "Neiba" in coords
+
+    lid = store.upsert_location({"name": "Barrio Test", "level": "custom", "municipio": "Neiba"})
+    assert store.remove_location(lid) is True
+    store.close()
+
+
+def test_topics_seed_and_selection(tmp_path):
+    store = DuckDBStore(tmp_path / "top.duckdb")
+    store.init_schema()
+    seed_topics(Config(), store)
+    topics = store.get_topics()
+    assert any(t["topic_id"] == "uva" for t in topics)
+    store.set_topic_selected("uva", False)
+    selected = [t["topic_id"] for t in store.get_topics(selected_only=True)]
+    assert "uva" not in selected
+    store.close()
+
+
+def test_comments_insert_and_search(tmp_path):
+    store = DuckDBStore(tmp_path / "com.duckdb")
+    store.init_schema()
+    store.insert_comments(
+        [
+            {"comment_id": "c1", "platform": "instagram", "text": "Excelente la feria de la uva en Neiba"},
+            {"comment_id": "c2", "platform": "facebook", "text": "Otra vez el apagon en Tamayo"},
+        ]
+    )
+    assert len(store.search_comments("uva")) == 1
+    assert len(store.search_comments("apagon")) == 1
+    assert len(store.get_comments()) == 2
+    store.close()
 
 
 def test_geo_landmark_assigns_municipio():

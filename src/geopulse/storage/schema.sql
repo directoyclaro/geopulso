@@ -87,6 +87,46 @@ CREATE TABLE IF NOT EXISTS keywords (
     created_at TIMESTAMP DEFAULT now()
 );
 
+CREATE TABLE IF NOT EXISTS locations (
+    location_id VARCHAR PRIMARY KEY,
+    name        VARCHAR,
+    level       VARCHAR,
+    municipio   VARCHAR,
+    province    VARCHAR DEFAULT 'Bahoruco',
+    country     VARCHAR DEFAULT 'DO',
+    lat         DOUBLE,
+    lon         DOUBLE,
+    aliases     VARCHAR[],
+    source      VARCHAR DEFAULT 'manual',
+    active      BOOLEAN DEFAULT TRUE,
+    created_at  TIMESTAMP DEFAULT now()
+);
+
+CREATE TABLE IF NOT EXISTS topics (
+    topic_id    VARCHAR PRIMARY KEY,
+    label       VARCHAR,
+    taxonomy_id VARCHAR,
+    keywords    VARCHAR[],
+    source      VARCHAR DEFAULT 'manual',
+    active      BOOLEAN DEFAULT TRUE,
+    selected    BOOLEAN DEFAULT TRUE,
+    created_at  TIMESTAMP DEFAULT now()
+);
+
+CREATE TABLE IF NOT EXISTS comments (
+    comment_id  VARCHAR PRIMARY KEY,
+    post_raw_id VARCHAR,
+    platform    VARCHAR,
+    text        VARCHAR,
+    language    VARCHAR,
+    author_hash VARCHAR,
+    posted_at   TIMESTAMP,
+    url         VARCHAR,
+    keywords    VARCHAR[],
+    simhash     UBIGINT,
+    collected_at TIMESTAMP DEFAULT now()
+);
+
 CREATE TABLE IF NOT EXISTS runs (
     run_id      VARCHAR PRIMARY KEY,
     job_type    VARCHAR,

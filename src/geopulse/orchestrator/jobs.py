@@ -8,7 +8,9 @@ from typing import Any
 from ..config import Config
 from ..pipeline import (
     collect_and_process,
+    collect_comments,
     discover_places,
+    regeo_all,
     run_discovery,
     run_enrichment,
     run_report,
@@ -33,6 +35,10 @@ def run_job(config: Config, store: DuckDBStore, job_type: str, payload: dict[str
         return run_trends(config, store)
     if job_type == "report":
         return run_report(config, store)
+    if job_type == "regeo":
+        return regeo_all(config, store)
+    if job_type == "collect_comments":
+        return collect_comments(config, store, payload["target"], amount=payload.get("amount", 50))
     if job_type == "search_keywords":
         return search_keywords(
             config,
