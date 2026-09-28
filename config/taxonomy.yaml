@@ -1,0 +1,81 @@
+# Taxonomía controlada de temas (dominio: Bahoruco, RD)
+# El agente enriquecedor (Fase 2) mapeará texto libre -> 'id' de esta jerarquía.
+version: 1
+language: es
+
+categories:
+  agro_economia:
+    label: "Agro y economía local"
+    children:
+      uva: "Uva / uvas"
+      platano: "Plátano"
+      cafe: "Café"
+      mango: "Mango"
+      pesca: "Pesca"
+      sal: "Producción de sal"
+      ganaderia: "Ganadería"
+      comercio: "Comercio y mercados"
+      empleo: "Empleo y trabajo"
+  ecoturismo:
+    label: "Ecoturismo y medio ambiente"
+    children:
+      lago_enriquillo: "Lago Enriquillo"
+      sierra_neiba: "Sierra de Neyba"
+      las_marias: "Las Marías"
+      incendios: "Incendios y sequía"
+      conservacion: "Conservación y reservas"
+  religion:
+    label: "Religión"
+    children:
+      catolica: "Iglesia católica"
+      evangelica: "Iglesias evangélicas"
+      fiestas_patronales: "Fiestas patronales"
+  deporte:
+    label: "Deporte"
+    children:
+      beisbol: "Béisbol invernal"
+      pelota_local: "Pelota / ligas locales"
+      futbol: "Fútbol"
+  musica_cultura:
+    label: "Música y cultura"
+    children:
+      bachata: "Bachata"
+      merengue: "Merengue"
+      dembow: "Dembow"
+      tipico: "Música típica"
+      carnaval: "Carnaval y tradiciones"
+  politica:
+    label: "Política y gestión municipal"
+    children:
+      ayuntamiento: "Ayuntamiento / alcaldía"
+      gobernacion: "Gobernación"
+      congreso: "Senadores y diputados"
+      obras: "Obras públicas"
+      elecciones: "Elecciones"
+  servicios:
+    label: "Servicios básicos"
+    children:
+      apagones: "Apagones / energía"
+      agua: "Agua potable"
+      transporte: "Transporte / motoconcho"
+      basura: "Recogida de basura"
+      salud: "Salud"
+      educacion: "Educación"
+  seguridad:
+    label: "Seguridad y sucesos"
+    children:
+      delincuencia: "Delincuencia"
+      accidentes: "Accidentes"
+      justicia: "Justicia"
+  sociedad:
+    label: "Sociedad y comunidad"
+    children:
+      migracion: "Migración y frontera"
+      remesas: "Remesas"
+      religion_comunidad: "Eventos comunitarios"
+      gastronomia: "Gastronomía"
+      clima: "Clima e inundaciones"
+  otros:
+    label: "Otros"
+    children:
+      sin_clasificar: "Sin clasificar"

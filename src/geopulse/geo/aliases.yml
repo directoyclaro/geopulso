@@ -1,0 +1,28 @@
+# Normalización de alias -> forma canónica usada en el gazetteer
+place_aliases:
+  neyba: Neiba
+  "neyba, bahoruco": Neiba
+  "neiba, bahoruco": Neiba
+  baoruco: Bahoruco
+  bahoruco: Bahoruco
+  jaragua: Villa Jaragua
+  barbacoa: Villa Jaragua
+  "trujillo valdez": Villa Jaragua
+  galvan: Galván
+  "los rios": Los Ríos
+  montserrat: Monserrat
+  "santa barbara": Santa Bárbara-El 6
+  "el 6": Santa Bárbara-El 6
+  "las canitas": Las Cañitas
+
+province_aliases:
+  - bahoruco
+  - baoruco
+  - "provincia bahoruco"
+  - "provincia baoruco"
+
+region_aliases:
+  - "region enriquillo"
+  - "región enriquillo"
+  - "zona sur"
+  - "sur profundo"

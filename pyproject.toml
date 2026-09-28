@@ -1,0 +1,36 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "geopulse"
+version = "0.1.0"
+description = "Observatorio de tendencias por zona geografica (Bahoruco, DO-03)"
+requires-python = ">=3.10"
+dependencies = [
+    "duckdb>=1.1.0",
+    "polars>=1.0.0",
+    "pyarrow>=17.0.0",
+    "pyyaml>=6.0.1",
+    "pydantic>=2.7.0",
+    "APScheduler>=3.10.4",
+    "httpx>=0.27.0",
+]
+
+[project.optional-dependencies]
+collect = ["playwright>=1.47.0", "instagrapi>=2.0.0"]
+nlp = ["langdetect>=1.0.9", "spacy>=3.7.0"]
+dashboard = ["streamlit>=1.37.0", "plotly>=5.23.0"]
+dev = ["pytest>=8.2.0"]
+
+[project.scripts]
+geopulse = "geopulse.cli:main"
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+geopulse = ["geo/*.json", "geo/*.yml", "storage/*.sql"]

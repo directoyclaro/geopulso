@@ -1,0 +1,71 @@
+project:
+  name: GeoPulse
+  edition: Bahoruco
+  country: DO
+  province_code: DO-03
+  language: es
+
+paths:
+  data_dir: data
+  bronze_dir: data/bronze
+  silver_dir: data/silver
+  gold_dir: data/gold
+  db_path: data/geopulse.duckdb
+  queue_path: data/jobs.sqlite
+  reports_dir: reports/output
+  secrets_dir: config/secrets
+  logs_dir: logs
+
+collection:
+  platforms:
+    - instagram
+    - facebook
+  # Backend de Instagram: "web" (Playwright con sesion de navegador) o "api" (instagrapi)
+  instagram_backend: web
+  # Control anti-bloqueo / RAM (8 GB -> 1 navegador a la vez)
+  max_concurrent_browsers: 1
+  request_delay_seconds: [5, 15]
+  max_requests_per_hour: 150
+  rotate_account_every_requests: 200
+  max_posts_per_source: 30
+  max_retries: 3
+  backoff_seconds: [5, 60]
+  # Proxies globales (se rotan). Formato: http://user:pass@host:port o socks5://host:port
+  proxies: []
+  headless: true
+  timeout_seconds: 45
+
+normalizer:
+  dedup_simhash_distance: 3
+  keep_only_spanish: true
+  min_text_length: 15
+
+geo:
+  min_confidence_municipio: 0.60
+  min_confidence_distrito: 0.75
+  allow_country_fallback: true
+
+llm:
+  provider: ollama
+  base_url: "http://localhost:11434"
+  model: "qwen2.5:3b-instruct"
+  batch_size: 4
+  timeout_seconds: 300
+  keep_alive: "5m"
+  temperature: 0.1
+  enabled: true
+  fallback_heuristic: true
+
+trends:
+  lookback_days: 30
+  min_volume: 3
+  z_threshold: 2.0
+  ratio_threshold: 2.0
+
+scheduler:
+  collect_instagram_cron: "0 */6 * * *"
+  collect_facebook_cron: "15 */6 * * *"
+  discover_cron: "30 3 * * *"
+  enrich_cron: "0 4 * * *"
+  trends_cron: "30 4 * * *"
+  report_cron: "45 4 * * *"

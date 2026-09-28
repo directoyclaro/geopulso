@@ -1,0 +1,139 @@
+{
+  "meta": {
+    "province": "Bahoruco",
+    "province_alt": "Baoruco",
+    "iso": "DO-03",
+    "country": "DO",
+    "coords_aprox": true,
+    "note": "Coordenadas aproximadas; el matching principal es por nombre y alias."
+  },
+  "places": [
+    {
+      "name": "Neiba",
+      "level": "municipio",
+      "municipio": "Neiba",
+      "is_capital": true,
+      "aliases": ["Neyba", "Neiba", "Villa de Neiba"],
+      "lat": 18.4833,
+      "lon": -71.4167
+    },
+    {
+      "name": "Tamayo",
+      "level": "municipio",
+      "municipio": "Tamayo",
+      "aliases": ["Tamayo", "Hatico"],
+      "lat": 18.4,
+      "lon": -71.2167
+    },
+    {
+      "name": "Villa Jaragua",
+      "level": "municipio",
+      "municipio": "Villa Jaragua",
+      "aliases": ["Villa Jaragua", "Jaragua", "Barbacoa", "Trujillo Valdez"],
+      "lat": 18.4833,
+      "lon": -71.5
+    },
+    {
+      "name": "Galván",
+      "level": "municipio",
+      "municipio": "Galván",
+      "aliases": ["Galván", "Galvan"],
+      "lat": 18.5,
+      "lon": -71.3333
+    },
+    {
+      "name": "Los Ríos",
+      "level": "municipio",
+      "municipio": "Los Ríos",
+      "aliases": ["Los Ríos", "Los Rios"],
+      "lat": 18.5167,
+      "lon": -71.5833
+    },
+    {
+      "name": "Uvilla",
+      "level": "distrito",
+      "municipio": "Neiba",
+      "aliases": ["Uvilla"],
+      "lat": 18.5333,
+      "lon": -71.4333
+    },
+    {
+      "name": "Las Clavellinas",
+      "level": "distrito",
+      "municipio": "Neiba",
+      "aliases": ["Las Clavellinas", "Clavellinas"],
+      "lat": 18.45,
+      "lon": -71.4333
+    },
+    {
+      "name": "El Palmar",
+      "level": "distrito",
+      "municipio": "Neiba",
+      "aliases": ["El Palmar"],
+      "lat": 18.4667,
+      "lon": -71.3833
+    },
+    {
+      "name": "El Salado",
+      "level": "distrito",
+      "municipio": "Tamayo",
+      "aliases": ["El Salado"],
+      "lat": 18.4167,
+      "lon": -71.2
+    },
+    {
+      "name": "Santa Bárbara-El 6",
+      "level": "distrito",
+      "municipio": "Tamayo",
+      "aliases": ["Santa Bárbara", "El 6", "Santa Barbara"],
+      "lat": 18.3833,
+      "lon": -71.2333
+    },
+    {
+      "name": "Cabeza de Toro",
+      "level": "distrito",
+      "municipio": null,
+      "aliases": ["Cabeza de Toro"],
+      "lat": 18.5333,
+      "lon": -71.2833
+    },
+    {
+      "name": "Mena",
+      "level": "distrito",
+      "municipio": null,
+      "aliases": ["Mena"],
+      "lat": 18.5333,
+      "lon": -71.4667
+    },
+    {
+      "name": "Monserrat",
+      "level": "distrito",
+      "municipio": null,
+      "aliases": ["Monserrat", "Montserrat"],
+      "lat": 18.4667,
+      "lon": -71.5
+    },
+    {
+      "name": "Santana",
+      "level": "distrito",
+      "municipio": null,
+      "aliases": ["Santana"],
+      "lat": 18.5,
+      "lon": -71.5
+    },
+    {
+      "name": "Las Cañitas",
+      "level": "distrito",
+      "municipio": null,
+      "aliases": ["Las Cañitas", "Las Canitas"],
+      "lat": 18.4833,
+      "lon": -71.5333
+    }
+  ],
+  "landmarks": [
+    { "name": "Lago Enriquillo", "aliases": ["Lago Enriquillo", "Enriquillo"], "lat": 18.5, "lon": -71.6833 },
+    { "name": "Sierra de Neyba", "aliases": ["Sierra de Neyba", "Sierra de Bahoruco", "Sierra de Baoruco"], "lat": 18.6, "lon": -71.4 },
+    { "name": "Las Marías", "aliases": ["Las Marías", "Las Marias"], "lat": 18.5167, "lon": -71.45 },
+    { "name": "Río Yaque del Sur", "aliases": ["Yaque del Sur", "Yaque"], "lat": 18.5, "lon": -71.6 }
+  ]
+}

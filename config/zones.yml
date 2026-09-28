@@ -1,0 +1,74 @@
+# Zona objetivo: Provincia Bahoruco (DO-03), República Dominicana
+country:
+  name: República Dominicana
+  iso: DO
+  language: es
+
+province:
+  name: Bahoruco
+  alt_name: Baoruco
+  code: DO-03
+  capital: Neiba
+
+municipios:
+  - name: Neiba
+    alt_name: Neyba
+    distritos: [Uvilla, Las Clavellinas, El Palmar]
+  - name: Tamayo
+    distritos: [El Salado, "Santa Bárbara-El 6"]
+  - name: Villa Jaragua
+    alt_name: Jaragua
+    distritos: []
+  - name: Galván
+    distritos: []
+  - name: Los Ríos
+    distritos: []
+
+# Distritos mencionados en algunas fuentes; reconciliar curado
+distritos_extra:
+  - Cabeza de Toro
+  - Mena
+  - Monserrat
+  - Santana
+  - Las Cañitas
+
+# Contexto regional (Región Enriquillo): útil para ampliar cobertura
+region_context:
+  name: Región Enriquillo
+  provinces: [Bahoruco, Barahona, Independencia, Pedernales]
+
+keywords:
+  - Bahoruco
+  - Baoruco
+  - Neiba
+  - Neyba
+  - Galván
+  - Tamayo
+  - Villa Jaragua
+  - Los Ríos
+  - Lago Enriquillo
+  - Sierra de Neyba
+  - Las Marías
+  - "27 de Febrero"
+  - uva
+  - Yadel Subervi
+  - Potioco
+  - Cristian Mendez
+  - Colorao
+  - Jose Dario
+  - Coopacrene
+
+hashtags:
+  - bahoruco
+  - baoruco
+  - neiba
+  - neyba
+  - galvan
+  - tamayo
+  - villajaragua
+  - losrios
+  - lagoenriquillo
+  - sierradeneyba
+
+# Lugares/IDs de Instagram que se completan durante el descubrimiento
+instagram_locations: []

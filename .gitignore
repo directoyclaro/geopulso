@@ -1,0 +1,39 @@
+# Entorno
+.venv/
+venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+
+# Secretos y sesiones (NUNCA subir)
+config/secrets/*
+!config/secrets/.gitkeep
+!config/secrets/accounts.example.yml
+*.session
+*.cookies
+.cookies/
+.streamlit/secrets.toml
+
+# Credenciales locales (NUNCA subir)
+datos de GitHub.md
+datos de GitHub*
+*credenciales*
+*token*.txt
+
+# Datos generados
+data/bronze/*
+data/silver/*
+data/gold/*
+!data/**/.gitkeep
+*.duckdb
+*.duckdb.wal
+*.parquet
+*.sqlite
+*.sqlite3
+*.sqlite.wal
+reports/output/*
+!reports/output/.gitkeep
+
+# Logs
+logs/
+*.log

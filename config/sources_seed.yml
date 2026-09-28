@@ -1,0 +1,127 @@
+# Listado semilla de fuentes para Provincia Bahoruco (DO-03)
+# verified: true  -> confirmada en el análisis inicial
+# verified: false -> candidata a verificar por el agente descubridor
+sources:
+  # --- Institucional / Gobierno ---
+  - name: "Gobernación Bahoruco"
+    platform: facebook
+    handle: "GBahoruco"
+    url: "https://www.facebook.com/GBahoruco/"
+    type: gobierno
+    municipio: Neiba
+    verified: true
+
+  - name: "Alcaldía de Neiba"
+    platform: facebook
+    handle: "alcaldianeiba"
+    url: "https://www.facebook.com/alcaldianeiba/"
+    type: gobierno
+    municipio: Neiba
+    verified: true
+
+  - name: "Alcaldía de Neiba (Instagram)"
+    platform: instagram
+    handle: "alcaldiadeneiba"
+    url: "https://www.instagram.com/alcaldiadeneiba/"
+    type: gobierno
+    municipio: Neiba
+    verified: true
+
+  - name: "Ayuntamiento Neyba Bahoruco"
+    platform: facebook
+    handle: "ayuntamientoneyba.bahoruco"
+    url: "https://www.facebook.com/ayuntamientoneyba.bahoruco/"
+    type: gobierno
+    municipio: Neiba
+    verified: true
+    note: "Posible duplicado de Alcaldía de Neiba; reconciliar."
+
+  - name: "Presidencia RD - Localidad Bahoruco"
+    platform: web
+    url: "https://presidencia.gob.do/localidad/bahoruco"
+    type: gobierno
+    municipio: null
+    verified: true
+
+  # --- Medios locales ---
+  - name: "Bahoruco Al Día (web)"
+    platform: web
+    url: "https://bahorucoaldia.com/"
+    type: medio
+    municipio: Neiba
+    verified: true
+
+  - name: "Bahoruco Al Día (Facebook)"
+    platform: facebook
+    handle: "bahorucoaldia"
+    url: "https://www.facebook.com/bahorucoaldia/"
+    type: medio
+    municipio: Neiba
+    verified: true
+
+  - name: "Diario Neyba Informativo"
+    platform: web
+    url: "https://www.neybainformativo.net/"
+    type: medio
+    municipio: Neiba
+    verified: true
+
+  - name: "Diario Neyba Noticias"
+    platform: facebook
+    handle: "61579092444257"
+    url: "https://www.facebook.com/profile.php?id=61579092444257"
+    type: medio
+    municipio: Neiba
+    verified: true
+
+  - name: "DigiPrensa - Bahoruco al Día"
+    platform: web
+    url: "https://digiprensa.com/bahoruco-al-dia/"
+    type: medio
+    municipio: Neiba
+    verified: true
+
+  - name: "Impacto Barahonero (regional)"
+    platform: web
+    url: "https://impactobarahonero.com.do/"
+    type: medio
+    municipio: null
+    region: Barahona
+    verified: true
+
+  # --- Candidatas (verificar) ---
+  - name: "El Futuro (Luis Herasme)"
+    platform: web
+    type: medio
+    municipio: null
+    verified: false
+
+  - name: "Identidad Bahoruquense"
+    platform: web
+    type: medio
+    municipio: null
+    verified: false
+
+  - name: "Alcaldía de Tamayo"
+    platform: facebook
+    type: gobierno
+    municipio: Tamayo
+    verified: false
+
+  - name: "Ayuntamiento Villa Jaragua"
+    platform: facebook
+    type: gobierno
+    municipio: Villa Jaragua
+    verified: false
+
+  - name: "Ayuntamiento de Galván"
+    platform: facebook
+    type: gobierno
+    municipio: Galván
+    verified: false
+
+  - name: "Ayuntamiento de Los Ríos"
+    platform: facebook
+    type: gobierno
+    municipio: Los Ríos
+    verified: false
